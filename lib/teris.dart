@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:aa_teris/base/widgets/background_image.dart';
 import 'package:aa_teris/piece.dart';
 import 'package:aa_teris/pixel.dart';
-import 'package:aa_teris/utils/extensions/gesture_detector_extensions.dart';
 import 'package:aa_teris/values.dart';
 import 'package:flutter/material.dart';
 
@@ -21,61 +20,116 @@ class GameBoard extends StatefulWidget {
 }
 
 class _GameBoardState extends State<GameBoard> {
+  late ValueNotifier<int> countdown;
+  Timer? countdownTimer;
   Piece currentPiece = Piece(type: Tetromino.L);
 
   int currentScore = 0;
 
-  bool gameOver = false;
+  Timer? gameTimer;
+  Duration frameRate = const Duration(milliseconds: 1500);
+
+  late ValueNotifier<bool> isPaused;
+  late ValueNotifier<bool> gameOverNotifier;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // showDialogStartGame();
+    countdown = ValueNotifier<int>(3);
+    isPaused = ValueNotifier<bool>(false);
+    gameOverNotifier = ValueNotifier<bool>(false);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      _startCountdown();
+    });
+  }
+
+  @override
+  void dispose() {
+    resetGame();
+    countdownTimer?.cancel();
+    countdown.dispose();
+    super.dispose();
+  }
+
+  void _startCountdown() {
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (countdown.value > 0) {
+        countdown.value--;
+      } else {
+        timer.cancel();
+        startGame();
+      }
     });
   }
 
   void startGame() {
     currentPiece.initializePiece();
-
-    Duration fameRate = const Duration(milliseconds: 1000);
-    _gameLoop(fameRate);
+    _gameLoop();
   }
 
-  void _gameLoop(Duration fameRate) {
-    Timer.periodic(fameRate, (timer) {
+  void restartGame() {
+    setState(() {
+      isPaused.value = false;
+      countdown.value = 3;
+      resetGame();
+      _startCountdown();
+    });
+  }
+
+  void pauseGame() {
+    if (gameTimer != null && gameTimer!.isActive) {
+      gameTimer!.cancel();
+      isPaused.value = true;
+    }
+  }
+
+  void resumeGame() {
+    if (isPaused.value) {
+      _gameLoop();
+      isPaused.value = false;
+    }
+  }
+
+  void _gameLoop() {
+    gameTimer = Timer.periodic(frameRate, (timer) {
+      if (isPaused.value) {
+        timer.cancel();
+        return;
+      }
+
       setState(() {
         clearLines();
         checkLanding();
 
-        if (gameOver) {
+        if (gameOverNotifier.value) {
           timer.cancel();
-          showDialogGameOver();
         }
+
         currentPiece.movePiece(Direction.down);
+        // Cập nhật tốc độ game sau mỗi lần clear line
+        updateFrameRate();
       });
     });
   }
 
-  void showDialogGameOver() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Game Over"),
-          content: Text("Your Score is: $currentScore"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                resetGame();
-                Navigator.pop(context);
-              },
-              child: Text("Play Again"),
-            ),
-          ],
-        );
-      },
-    );
+  void updateFrameRate() {
+    const int minFrameRate = 100; // Giới hạn tối thiểu (ms)
+    const int initialFrameRate = 1500; // Frame rate ban đầu (ms)
+    const double k = 0.00005; // Hệ số giảm tốc
+
+    int newFrameRate = (initialFrameRate * exp(-k * currentScore)).toInt();
+    newFrameRate = newFrameRate.clamp(minFrameRate, initialFrameRate);
+
+    if (newFrameRate != frameRate.inMilliseconds) {
+      frameRate = Duration(milliseconds: newFrameRate);
+      gameTimer?.cancel();
+      _gameLoop();
+    }
+  }
+
+  void backToHome() {
+    Navigator.pop(context);
   }
 
   void showDialogStartGame() {
@@ -104,10 +158,9 @@ class _GameBoardState extends State<GameBoard> {
       colLength,
       (i) => List.generate(rowLength, (j) => null),
     );
-    gameOver = false;
+    gameOverNotifier.value = false;
     currentScore = 0;
     createNewPiece();
-    startGame();
   }
 
   bool checkCollision(Direction direction) {
@@ -158,7 +211,7 @@ class _GameBoardState extends State<GameBoard> {
     currentPiece.initializePiece();
 
     if (isGameOver()) {
-      gameOver = true;
+      gameOverNotifier.value = true;
     }
   }
 
@@ -201,14 +254,18 @@ class _GameBoardState extends State<GameBoard> {
         }
         gameBoard[0] = List.generate(row, (index) => null);
 
-        currentScore++;
+        currentScore = currentScore + 100;
       }
     }
   }
 
   bool isGameOver() {
+    if (gameBoard.isEmpty || gameBoard[0].length < rowLength) {
+      return false;
+    }
+
     for (int col = 0; col < rowLength; col++) {
-      if (gameBoard[0][col] != null) {
+      if (col < gameBoard[0].length && gameBoard[0][col] != null) {
         return true;
       }
     }
@@ -219,46 +276,184 @@ class _GameBoardState extends State<GameBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.home),
+          color: Colors.amber[100],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: ValueListenableBuilder<bool>(
+                valueListenable: isPaused,
+                builder: (context, paused, child) {
+                  return ValueListenableBuilder<int>(
+                    valueListenable: countdown,
+                    builder: (context, value, child) {
+                      final textStyle = TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber[100]);
+                      if (value == 0 && !paused) {
+                        return InkWell(
+                            onTap: () => pauseGame(),
+                            child: Icon(
+                              Icons.pause,
+                              color: Colors.amber[100],
+                            ));
+                      } else if (!paused) {
+                        return Text(
+                          "$value",
+                          style: textStyle,
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  );
+                }),
+          ),
+        ],
+        title: Text(
+          "Score: $currentScore",
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+        centerTitle: true,
+      ),
       backgroundColor: Colors.black,
-      body: Stack(children: [BackGroundImage(), _buildBody()]),
+      body: Stack(children: [
+        BackGroundImage(),
+        _buildBody(),
+        _buildOverlayPauseGame(),
+      ]),
+    );
+  }
+
+  Widget _buildOverlayPauseGame() {
+    return ValueListenableBuilder<bool>(
+        valueListenable: isPaused,
+        builder: (context, pause, child) {
+          return ValueListenableBuilder(
+            valueListenable: gameOverNotifier,
+            builder: (context, gameOver, child) {
+              if (pause || gameOver) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.7),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Spacer(),
+                            _buildTextOverlay(
+                                label: gameOver ? "Game Over!" : "Paused!"),
+                            SizedBox(height: 50),
+                            if (pause)
+                              _buildButtonOverlay(
+                                label: "Continue",
+                                ontap: () => resumeGame(),
+                              ),
+                            if (gameOver) ...[
+                              Text("Score",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18)),
+                              Text(currentScore.toString(),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 24)),
+                            ],
+                            _buildButtonOverlay(
+                              label: "Restart",
+                              ontap: () => restartGame(),
+                            ),
+                            _buildButtonOverlay(
+                              label: "Home",
+                              ontap: () => backToHome(),
+                            ),
+                            Spacer(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return SizedBox.shrink();
+              }
+            },
+          );
+        });
+  }
+
+  FractionallySizedBox _buildButtonOverlay({
+    required String label,
+    required VoidCallback ontap,
+  }) {
+    return FractionallySizedBox(
+      widthFactor: 0.5,
+      child: InkWell(
+        onTap: ontap,
+        child: Container(
+          margin: EdgeInsets.only(top: 24),
+          decoration: BoxDecoration(
+            color: Colors.amber[100],
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: Colors.brown[600],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Center _buildTextOverlay({required String label}) {
+    return Center(
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 30,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
   Widget _buildBody() {
-    return GestureDetectorExtensions.detectContinuousDrag(
-      onDragUpdate: (direction, _) {
-        switch (direction) {
-          case SwipeDirection.left:
-            moveLeft();
-            break;
-          case SwipeDirection.right:
-            moveRight();
-            break;
-          default:
-        }
-      },
+    return SafeArea(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            flex: 1,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                "Score: $currentScore",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ),
-          ),
-          Expanded(
             flex: 9,
-            child: Center(
-              child: Column(
-                children: [
-                  _buildBoardGame(),
-                  _buildControlGame(),
-                  _buildButtonPlayGame(),
-                ],
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(),
+                _buildBoardGame(),
+                Spacer(),
+                _buildControlGame(),
+                Spacer()
+              ],
             ),
           ),
         ],
@@ -293,9 +488,10 @@ class _GameBoardState extends State<GameBoard> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.2)),
         child: Center(
           child: Icon(icon ?? Icons.arrow_back_ios_new, color: Colors.white),
         ),
@@ -303,73 +499,55 @@ class _GameBoardState extends State<GameBoard> {
     );
   }
 
+  void downSpeed() {
+    while (!checkCollision(Direction.down)) {
+      currentPiece.movePiece(Direction.down);
+    }
+    checkLanding(); // Khi rơi xong, kiểm tra và cập nhật game board
+  }
+
   Widget _buildBoardGame() {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.brown, width: 1),
       ),
-      child: FractionallySizedBox(
-        widthFactor: 0.6,
-        child: GridView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: rowLength * colLength,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: rowLength,
-          ),
-          itemBuilder: (context, index) {
-            try {
-              final int row = (index / rowLength).floor();
-              final int col = (index % rowLength);
-              if (currentPiece.position.contains(index)) {
-                return Pixel(color: currentPiece.color, child: index);
-              } else if (gameBoard[row][col] != null) {
-                final Tetromino? tetrominoType = gameBoard[row][col];
+      child: GestureDetector(
+        onTap: () {
+          downSpeed();
+        },
+        child: FractionallySizedBox(
+          widthFactor: 0.8,
+          child: GridView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: rowLength * colLength,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: rowLength,
+            ),
+            itemBuilder: (context, index) {
+              try {
+                final int row = (index / rowLength).floor();
+                final int col = (index % rowLength);
+                if (currentPiece.position.contains(index)) {
+                  return Pixel(color: Colors.amber[100], child: index);
+                } else if (gameBoard[row][col] != null) {
+                  // final Tetromino? tetrominoType = gameBoard[row][col];
 
-                return Pixel(
-                  color: tetrominoType?.color ?? Colors.white,
-                  child: index,
-                );
-              } else {
+                  return Pixel(
+                    color: Colors.amber[100],
+                    child: index,
+                  );
+                } else {
+                  return Pixel(color: Colors.grey.shade900, child: index);
+                }
+              } catch (e) {
+                print('============= LOG check bug level $e');
+
                 return Pixel(color: Colors.grey.shade900, child: index);
               }
-            } catch (e) {
-              return Pixel(color: Colors.grey.shade900, child: index);
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButtonPlayGame() {
-    return InkWell(
-      onTap: startGame,
-      child: FractionallySizedBox(
-        widthFactor: 0.8,
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.amber[100],
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Center(
-                  child: Text(
-                    "Play",
-                    style: TextStyle(
-                      color: Colors.amber[1000],
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            },
+          ),
         ),
       ),
     );
