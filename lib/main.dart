@@ -1,19 +1,18 @@
-import 'package:aa_teris/ui/start_screen/start_screen.dart';
-import 'package:aa_teris/utils/extensions/status_bar_extension.dart';
+import 'package:aa_teris/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Đảm bảo full màn hình, tránh nền đen trên status bar
-  // StatusBarExt.setInitializeSystemOverlayLightStyle(isLight: true);
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -25,10 +24,19 @@ class MyApp extends StatelessWidget {
         statusBarBrightness: Brightness.light,
       ),
     );
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      home: StartGame(),
+      defaultTransition: Transition.cupertino,
+      initialRoute: AppRoute.HOME.name,
+      initialBinding: AppRoute.HOME.binding,
+      onGenerateInitialRoutes: (initialRoute) {
+        final settings =
+            RouteSettings(name: initialRoute, arguments: Get.arguments);
+        return [AppRouteExt.bindingRoute(settings)];
+      },
+      onGenerateRoute: AppRouteExt.bindingRoute,
+      navigatorObservers: <NavigatorObserver>[routeObserver],
     );
   }
 }

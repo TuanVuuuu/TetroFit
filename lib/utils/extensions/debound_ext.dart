@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 extension DebounceFunction on Function {
   Function debounce(Duration duration) {

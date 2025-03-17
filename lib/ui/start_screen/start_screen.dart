@@ -1,8 +1,11 @@
 import 'dart:io';
 
-import 'package:aa_teris/teris.dart';
+import 'package:aa_teris/app_routes.dart';
+import 'package:aa_teris/main.dart';
+import 'package:aa_teris/manager/share_preference_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 class StartGame extends StatefulWidget {
   const StartGame({super.key});
@@ -11,20 +14,40 @@ class StartGame extends StatefulWidget {
   State<StartGame> createState() => _StartGameState();
 }
 
-class _StartGameState extends State<StartGame> with WidgetsBindingObserver {
+class _StartGameState extends State<StartGame>
+    with RouteAware, WidgetsBindingObserver {
+  late ValueNotifier<int> hightScore;
   @override
   void initState() {
     super.initState();
+    hightScore = ValueNotifier<int>(0);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setSystemUIMode();
+      _setHightScore();
     });
   }
 
   @override
+  void didChangeDependencies() {
+    routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _setHightScore();
+  }
+
+  Future<void> _setHightScore() async {
+    hightScore.value = await SharedPreferenceManager.getHighScore();
   }
 
   void _setSystemUIMode() {
@@ -80,9 +103,12 @@ class _StartGameState extends State<StartGame> with WidgetsBindingObserver {
                   "Teris Game",
                   style: TextStyle(color: Colors.amber[100], fontSize: 40),
                 ),
-                Text(
-                  "Score: 100",
-                  style: TextStyle(color: Colors.amber[100], fontSize: 20),
+                ValueListenableBuilder(
+                  valueListenable: hightScore,
+                  builder: (context, value, child) => Text(
+                    "Score: $value",
+                    style: TextStyle(color: Colors.amber[100], fontSize: 20),
+                  ),
                 ),
                 Spacer(),
                 _buildButtonPlayGame(),
@@ -107,10 +133,9 @@ class _StartGameState extends State<StartGame> with WidgetsBindingObserver {
 
   Widget _buildButtonPlayGame() {
     return InkWell(
-      onTap:
-          () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (context) => GameBoard())),
+      onTap: () {
+        Get.toNamed(AppRoute.GAME.name);
+      },
       child: FractionallySizedBox(
         widthFactor: 0.8,
         child: Row(

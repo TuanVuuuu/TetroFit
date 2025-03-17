@@ -1,6 +1,7 @@
-import 'package:aa_teris/teris.dart';
+import 'package:aa_teris/controllers/game_controller.dart';
 import 'package:aa_teris/values.dart';
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 
 class Piece {
   Tetromino type;
@@ -13,23 +14,22 @@ class Piece {
     return type.color;
   }
 
-  void initializePiece() {
+  List<int> initializePiece() {
     switch (type) {
       case Tetromino.L:
-        position = [-26, -16, -6, -5];
-        break;
+        return [-26, -16, -6, -5];
       case Tetromino.J:
-        position = [-25, -15, -5, -6];
+        return [-25, -15, -5, -6];
       case Tetromino.I:
-        position = [-4, -5, -6, -7];
+        return [-4, -5, -6, -7];
       case Tetromino.O:
-        position = [-15, -16, -5, -6];
+        return [-15, -16, -5, -6];
       case Tetromino.S:
-        position = [-15, -14, -6, -5];
+        return [-15, -14, -6, -5];
       case Tetromino.Z:
-        position = [-17, -16, -6, -5];
+        return [-17, -16, -6, -5];
       case Tetromino.T:
-        position = [-26, -16, -6, -15];
+        return [-26, -16, -6, -15];
     }
   }
 
@@ -495,6 +495,7 @@ class Piece {
   }
 
   bool positionIsValid(int position) {
+    final gameBoard = Get.find<BoardGameController>().gameBoard;
     int row = (position / rowLength).floor();
     int col = position % rowLength;
 
