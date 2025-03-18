@@ -1,5 +1,5 @@
 import 'package:aa_teris/controllers/game_controller.dart';
-import 'package:aa_teris/values.dart';
+import 'package:aa_teris/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 

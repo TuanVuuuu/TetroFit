@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:aa_teris/app_routes.dart';
+import 'package:aa_teris/routes/app_routes.dart';
 import 'package:aa_teris/main.dart';
-import 'package:aa_teris/manager/share_preference_manager.dart';
+import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

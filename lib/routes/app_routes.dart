@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:aa_teris/controllers/game_controller.dart';
-import 'package:aa_teris/teris.dart';
-import 'package:aa_teris/ui/start_screen/start_screen.dart';
+import 'package:aa_teris/views/board_game_screen.dart';
+import 'package:aa_teris/views/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

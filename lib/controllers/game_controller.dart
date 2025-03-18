@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:aa_teris/manager/share_preference_manager.dart';
-import 'package:aa_teris/piece.dart';
-import 'package:aa_teris/values.dart';
+import 'package:aa_teris/services/share_preference_manager.dart';
+import 'package:aa_teris/models/piece.dart';
+import 'package:aa_teris/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

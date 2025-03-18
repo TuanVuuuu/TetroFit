@@ -1,12 +1,12 @@
 import 'package:aa_teris/controllers/game_controller.dart';
-import 'package:aa_teris/view/aa_button.dart';
-import 'package:aa_teris/view/board_game_header.dart';
+import 'package:aa_teris/widgets/aa_button.dart';
+import 'package:aa_teris/widgets/board_game_header.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:aa_teris/base/widgets/background_image.dart';
-import 'package:aa_teris/pixel.dart';
-import 'package:aa_teris/values.dart';
+import 'package:aa_teris/widgets/background_image.dart';
+import 'package:aa_teris/models/pixel.dart';
+import 'package:aa_teris/values/values.dart';
 
 class GameBoardView extends GetView<BoardGameController> {
   const GameBoardView({super.key});
