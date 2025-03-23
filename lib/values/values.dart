@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 final rowLength = 10;
-final colLength = 20;
+final colLength = 15;
 
 enum Direction { left, right, down }
 

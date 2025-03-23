@@ -1,12 +1,16 @@
 import 'package:aa_teris/routes/app_routes.dart';
+import 'package:aa_teris/services/sound_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
+late final SoundManager soundManager;
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  soundManager = SoundManager();
   runApp(const MyApp());
 }
 

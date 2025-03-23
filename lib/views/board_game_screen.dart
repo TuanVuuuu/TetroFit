@@ -1,6 +1,7 @@
 import 'package:aa_teris/controllers/game_controller.dart';
 import 'package:aa_teris/widgets/aa_button.dart';
 import 'package:aa_teris/widgets/board_game_header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +48,7 @@ class GameBoardView extends GetView<BoardGameController> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(),
+                Spacer(),
                 _buildBoardGame(),
                 Spacer(),
                 _buildControlGame(),
@@ -137,6 +138,9 @@ class GameBoardView extends GetView<BoardGameController> {
                     return Pixel(color: Colors.grey.shade900, child: index);
                   }
                 } catch (e) {
+                  if (kDebugMode) {
+                    print('============= LOG check bug level $e');
+                  }
                   return Pixel(color: Colors.grey.shade900, child: index);
                 }
               });

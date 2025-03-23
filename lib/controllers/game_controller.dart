@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:aa_teris/main.dart';
 import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:aa_teris/models/piece.dart';
 import 'package:aa_teris/values/values.dart';
@@ -66,6 +67,7 @@ class BoardGameController extends GetxController {
       (i) => List.generate(rowLength, (j) => null),
     ));
     gameOver.value = false;
+    isPaused.value = false;
     currentScore.value = 0;
     createNewPiece();
   }
@@ -81,9 +83,14 @@ class BoardGameController extends GetxController {
     currentPiece.refresh();
 
     if (isGameOver()) {
-      gameOver.value = true;
-      setHighScore();
+      setGameOver();
     }
+  }
+
+  void setGameOver() {
+    soundManager.playSfx('game_over');
+    gameOver.value = true;
+    setHighScore();
   }
 
   Future<void> setHighScore() async {
@@ -172,11 +179,20 @@ class BoardGameController extends GetxController {
         row += 1;
       }
 
-      if (row >= colLength || col < 0 || col >= rowLength) {
+      // Chạm đáy
+      if (row >= colLength) {
+        soundManager.playSfx('block_place');
         return true;
       }
 
+      // Chạm hai bên tường
+      if (col < 0 || col >= rowLength) {
+        return true;
+      }
+
+      // chạm các khối khác
       if (row >= 0 && gameBoard[row][col] != null) {
+        soundManager.playSfx('block_place');
         return true;
       }
     }
@@ -201,6 +217,7 @@ class BoardGameController extends GetxController {
         gameBoard[0] = List.generate(row, (index) => null);
 
         currentScore.value = currentScore.value + 100;
+        soundManager.playSfx('line_clear');
       }
     }
   }
@@ -227,10 +244,12 @@ class BoardGameController extends GetxController {
   }
 
   void backToHome() {
+    resetGame();
     Get.back();
   }
 
   void downSpeed() {
+    if (countdown.value > 0) return;
     while (!checkCollision(Direction.down)) {
       movePiece(Direction.down);
     }

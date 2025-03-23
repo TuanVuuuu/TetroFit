@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:aa_teris/routes/app_routes.dart';
 import 'package:aa_teris/main.dart';
+import 'package:aa_teris/routes/app_routes.dart';
 import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +17,7 @@ class StartGame extends StatefulWidget {
 class _StartGameState extends State<StartGame>
     with RouteAware, WidgetsBindingObserver {
   late ValueNotifier<int> hightScore;
+
   @override
   void initState() {
     super.initState();
@@ -134,6 +135,7 @@ class _StartGameState extends State<StartGame>
   Widget _buildButtonPlayGame() {
     return InkWell(
       onTap: () {
+        soundManager.playSfx("button_click");
         Get.toNamed(AppRoute.GAME.name);
       },
       child: FractionallySizedBox(
