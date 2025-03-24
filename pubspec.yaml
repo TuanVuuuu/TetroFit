@@ -48,6 +48,39 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.5
+
+# dart run flutter_launcher_icons -f pubspec.yaml
+flutter_launcher_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/res_for_gen/ic_launcher_ios.png"
+  image_path_android: "assets/res_for_gen/ic_launcher_android.png"
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/res_for_gen/ic_launcher_web.png"
+    background_color: "#FFFFFF"
+    theme_color: "#0072EE"
+  macos:
+    generate: true
+    image_path: "assets/res_for_gen/ic_launcher_mac.png"
+
+# dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#000000"
+  image: assets/res_for_gen/ic_logo_splash.png
+  android: true
+  android_gravity: center
+  ios: true
+  ios_content_mode: center
+  web: true
+  fullscreen: true
+  android_12:
+    image: assets/res_for_gen/ic_logo_splash_android_12.png
+    icon_background_color: "#000000"
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -65,6 +98,7 @@ flutter:
     - assets/images/
     - assets/audio/
     - assets/audio/block_place.wav
+    - assets/res_for_gen/ic_logo_splash.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

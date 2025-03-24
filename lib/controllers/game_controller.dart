@@ -211,12 +211,16 @@ class BoardGameController extends GetxController {
       }
 
       if (rowIsFull) {
+        // Dịch tất cả hàng phía trên xuống
         for (int r = row; r > 0; r--) {
           gameBoard[r] = List.from(gameBoard[r - 1]);
         }
-        gameBoard[0] = List.generate(row, (index) => null);
 
-        currentScore.value = currentScore.value + 100;
+        // Đặt hàng trên cùng thành hàng trống
+        gameBoard[0] = List.generate(rowLength, (index) => null);
+
+        // Cập nhật điểm số
+        currentScore.value += 100;
         soundManager.playSfx('line_clear');
       }
     }

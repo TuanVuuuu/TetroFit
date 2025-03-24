@@ -83,7 +83,6 @@ class _StartGameState extends State<StartGame>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber,
       extendBodyBehindAppBar: true,
       body: _buildBody(),
     );
