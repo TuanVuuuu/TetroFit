@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
       ),
     );
     return GetMaterialApp(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       defaultTransition: Transition.cupertino,
       initialRoute: AppRoute.HOME.name,
