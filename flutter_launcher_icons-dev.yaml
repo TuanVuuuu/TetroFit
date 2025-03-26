@@ -1,0 +1,15 @@
+# flutter pub run flutter_launcher_icons:main -f flutter_launcher_icons*
+flutter_launcher_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/res_for_gen/ic_launcher_ios_dev.png"
+  image_path_android: "assets/res_for_gen/ic_launcher_android_dev.png"
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/res_for_gen/ic_launcher_web.png"
+    background_color: "#FFFFFF"
+    theme_color: "#0072EE"
+  macos:
+    generate: true
+    image_path: "assets/res_for_gen/ic_launcher_mac.png"

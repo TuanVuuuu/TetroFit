@@ -62,10 +62,9 @@ class BoardGameController extends GetxController {
 
   void resetGame() {
     gameBoard.clear();
-    gameBoard.assignAll(List.generate(
-      colLength,
-      (i) => List.generate(rowLength, (j) => null),
-    ));
+    gameBoard.assignAll(
+      List.generate(colLength, (i) => List.generate(rowLength, (j) => null)),
+    );
     gameOver.value = false;
     isPaused.value = false;
     currentScore.value = 0;
@@ -181,7 +180,7 @@ class BoardGameController extends GetxController {
 
       // Chạm đáy
       if (row >= colLength) {
-        soundManager.playSfx('block_place');
+        // soundManager.playSfx('block_place');
         return true;
       }
 
@@ -192,7 +191,7 @@ class BoardGameController extends GetxController {
 
       // chạm các khối khác
       if (row >= 0 && gameBoard[row][col] != null) {
-        soundManager.playSfx('block_place');
+        // soundManager.playSfx('block_place');
         return true;
       }
     }
@@ -257,6 +256,7 @@ class BoardGameController extends GetxController {
     while (!checkCollision(Direction.down)) {
       movePiece(Direction.down);
     }
+    soundManager.playSfx('block_place');
     checkLanding(); // Khi rơi xong, kiểm tra và cập nhật game board
   }
 

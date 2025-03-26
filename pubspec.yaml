@@ -37,6 +37,7 @@ dependencies:
   get: ^4.7.2
   shared_preferences: ^2.5.2
   audioplayers: ^6.4.0
+  flutter_flavorizr: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -53,7 +54,7 @@ dev_dependencies:
 
 # dart run flutter_launcher_icons -f pubspec.yaml
 flutter_launcher_icons:
-  ios: true
+  ios: true  
   android: true
   image_path_ios: "assets/res_for_gen/ic_launcher_ios.png"
   image_path_android: "assets/res_for_gen/ic_launcher_android.png"
@@ -80,6 +81,27 @@ flutter_native_splash:
   android_12:
     image: assets/res_for_gen/ic_logo_splash_android_12.png
     icon_background_color: "#000000"
+
+# Config FLAVOR
+flavorizr:
+  flavors:
+    dev:
+      app:
+        name: "RetroTrixDev"
+      android:
+        applicationId: "com.example.aa_teris.dev"
+
+    stag:
+      app:
+        name: "RetroTrixStag"
+      android:
+        applicationId: "com.example.aa_teris.stag"
+
+    prod:
+      app:
+        name: "RetroTrix"
+      android:
+        applicationId: "com.example.aa_teris"
 
 
 # For information on the generic Dart part of this file, see the
