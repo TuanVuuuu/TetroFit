@@ -1,4 +1,4 @@
-package com.example.aa_teris
+package com.retrotrix.tetrofit
 
 import android.os.Bundle
 import android.view.View

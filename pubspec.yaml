@@ -52,6 +52,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.5
+  change_app_package_name: ^1.5.0
 
 # dart run flutter_launcher_icons -f pubspec.yaml
 flutter_launcher_icons:
@@ -90,19 +91,19 @@ flavorizr:
       app:
         name: "RetroTrixDev"
       android:
-        applicationId: "com.example.aa_teris.dev"
+        applicationId: "com.retrotrix.tetrofit.dev"
 
     stag:
       app:
         name: "RetroTrixStag"
       android:
-        applicationId: "com.example.aa_teris.stag"
+        applicationId: "com.retrotrix.tetrofit.stag"
 
     prod:
       app:
         name: "RetroTrix"
       android:
-        applicationId: "com.example.aa_teris"
+        applicationId: "com.retrotrix.tetrofit"
 
 
 # For information on the generic Dart part of this file, see the

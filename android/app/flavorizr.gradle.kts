@@ -8,17 +8,17 @@ android.apply {
     productFlavors {
         create("dev") {
             dimension = "flavor-type"
-            applicationId = "com.example.aa_teris.dev"
+            applicationId = "com.retrotrix.tetrofit.dev"
             resValue(type = "string", name = "app_name", value = "RetroTrixDev")
         }
         create("stag") {
             dimension = "flavor-type"
-            applicationId = "com.example.aa_teris.stag"
+            applicationId = "com.retrotrix.tetrofit.stag"
             resValue(type = "string", name = "app_name", value = "RetroTrixStag")
         }
         create("prod") {
             dimension = "flavor-type"
-            applicationId = "com.example.aa_teris"
+            applicationId = "com.retrotrix.tetrofit"
             resValue(type = "string", name = "app_name", value = "RetroTrix")
         }
     }
