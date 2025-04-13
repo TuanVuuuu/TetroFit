@@ -2,7 +2,7 @@
 #chmod +x flutterfire-config.sh
 
 # Tên project Firebase trên Firebase Console
-FIREBASE_PROJECT_ID="retrotrix-e7c34"
+FIREBASE_PROJECT_ID="tetrofit"
 
 # Cấu hình Dev
 flutterfire configure \

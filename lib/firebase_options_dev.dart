@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -53,10 +41,47 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w',
-    appId: '1:1060208771959:android:af99d3be82153016945772',
-    messagingSenderId: '1060208771959',
-    projectId: 'retrotrix-e7c34',
-    storageBucket: 'retrotrix-e7c34.firebasestorage.app',
+    apiKey: 'AIzaSyB0TFLB_0qBCyqv8w-EhYmaT0thrBuCP4w',
+    appId: '1:236116000088:android:978c211f47a4ce1042392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    storageBucket: 'tetrofit.firebasestorage.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBbsG4hFQpHiXM3Y5wKEauFeht_iGzKWro',
+    appId: '1:236116000088:web:2f1f95d0da4206f442392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    authDomain: 'tetrofit.firebaseapp.com',
+    storageBucket: 'tetrofit.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD6tz3p-gr5S-19y7X9-xBZDRP6y44jfVk',
+    appId: '1:236116000088:ios:f9dbe39869b3a53142392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    storageBucket: 'tetrofit.firebasestorage.app',
+    iosBundleId: 'com.example.aaTeris',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyD6tz3p-gr5S-19y7X9-xBZDRP6y44jfVk',
+    appId: '1:236116000088:ios:f9dbe39869b3a53142392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    storageBucket: 'tetrofit.firebasestorage.app',
+    iosBundleId: 'com.example.aaTeris',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBbsG4hFQpHiXM3Y5wKEauFeht_iGzKWro',
+    appId: '1:236116000088:web:df8fc7bbe3bead7f42392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    authDomain: 'tetrofit.firebaseapp.com',
+    storageBucket: 'tetrofit.firebasestorage.app',
+  );
+
 }

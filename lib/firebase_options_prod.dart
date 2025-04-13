@@ -53,10 +53,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w',
-    appId: '1:1060208771959:android:7e6adad67c9eda7f945772',
-    messagingSenderId: '1060208771959',
-    projectId: 'retrotrix-e7c34',
-    storageBucket: 'retrotrix-e7c34.firebasestorage.app',
+    apiKey: 'AIzaSyB0TFLB_0qBCyqv8w-EhYmaT0thrBuCP4w',
+    appId: '1:236116000088:android:3ad11574c769376f42392d',
+    messagingSenderId: '236116000088',
+    projectId: 'tetrofit',
+    storageBucket: 'tetrofit.firebasestorage.app',
   );
+
 }

@@ -21,9 +21,9 @@ lane :beta do |options|
   
   # Firebase App ID mapping
   firebase_app_id = {
-    "dev" => "1:1060208771959:android:af99d3be82153016945772",
-    "stag" => "1:1060208771959:android:60ed8bb3ae0f206f945772",
-    "prod" => "1:1060208771959:android:7e6adad67c9eda7f945772"
+    "dev" => "1:236116000088:android:978c211f47a4ce1042392d",
+    "stag" => "1:236116000088:android:0ef77bea3ffacf9742392d",
+    "prod" => "1:236116000088:android:3ad11574c769376f42392d"
   }[flavor] or UI.user_error!("Unknown flavor: #{flavor}")
 
   # APK path - sử dụng đường dẫn tuyệt đối
