@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1060208771959",
+    "project_id": "retrotrix-e7c34",
+    "storage_bucket": "retrotrix-e7c34.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060208771959:android:7e6adad67c9eda7f945772",
+        "android_client_info": {
+          "package_name": "com.example.aa_teris"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060208771959:android:af99d3be82153016945772",
+        "android_client_info": {
+          "package_name": "com.example.aa_teris.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

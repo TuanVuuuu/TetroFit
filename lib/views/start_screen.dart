@@ -24,7 +24,7 @@ class _StartGameState extends State<StartGame>
     hightScore = ValueNotifier<int>(0);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setSystemUIMode();
+      // _setSystemUIMode();
       _setHightScore();
     });
   }
@@ -74,9 +74,9 @@ class _StartGameState extends State<StartGame>
     // final viewInsets = WidgetsBinding.instance.window.viewInsets.bottom;
     // if (viewInsets > 0) {
     // Nếu người dùng vuốt lên, hiển thị bottom navigation bar trong 3s
-    Future.delayed(const Duration(seconds: 2), () {
-      _setSystemUIMode();
-    });
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   _setSystemUIMode();
+    // });
     // }
   }
 
