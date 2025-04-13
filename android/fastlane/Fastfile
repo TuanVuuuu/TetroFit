@@ -34,7 +34,7 @@ lane :beta do |options|
     UI.message("Environment Info:")
     UI.message("- Flavor: #{flavor}")
     UI.message("- Firebase App ID: #{firebase_app_id}")
-    UI.message("- Package Name: com.example.aa_teris")
+    UI.message("- Package Name: com.retrotrix.tetrofit")
     UI.message("- Tester Emails: #{tester_emails}")
     UI.message("- Tester Groups: #{tester_groups}")
     UI.message("- Release Notes: #{release_notes}")

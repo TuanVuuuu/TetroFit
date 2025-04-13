@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "1060208771959",
-    "project_id": "retrotrix-e7c34",
-    "storage_bucket": "retrotrix-e7c34.firebasestorage.app"
+    "project_number": "236116000088",
+    "project_id": "tetrofit",
+    "storage_bucket": "tetrofit.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1060208771959:android:7e6adad67c9eda7f945772",
+        "mobilesdk_app_id": "1:236116000088:android:3ad11574c769376f42392d",
         "android_client_info": {
-          "package_name": "com.example.aa_teris"
+          "package_name": "com.retrotrix.tetrofit"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w"
+          "current_key": "AIzaSyB0TFLB_0qBCyqv8w-EhYmaT0thrBuCP4w"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1060208771959:android:af99d3be82153016945772",
+        "mobilesdk_app_id": "1:236116000088:android:978c211f47a4ce1042392d",
         "android_client_info": {
-          "package_name": "com.example.aa_teris.dev"
+          "package_name": "com.retrotrix.tetrofit.dev"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w"
+          "current_key": "AIzaSyB0TFLB_0qBCyqv8w-EhYmaT0thrBuCP4w"
         }
       ],
       "services": {
@@ -45,15 +45,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1060208771959:android:60ed8bb3ae0f206f945772",
+        "mobilesdk_app_id": "1:236116000088:android:0ef77bea3ffacf9742392d",
         "android_client_info": {
-          "package_name": "com.example.aa_teris.stag"
+          "package_name": "com.retrotrix.tetrofit.stag"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBVt-C5rhsmh8-shv_67jHpjAoEN6O5K6w"
+          "current_key": "AIzaSyB0TFLB_0qBCyqv8w-EhYmaT0thrBuCP4w"
         }
       ],
       "services": {

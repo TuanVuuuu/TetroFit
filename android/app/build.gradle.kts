@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "com.retrotrix.tetrofit"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     val keystorePropertiesFile = rootProject.file("key.properties")
@@ -79,8 +79,8 @@ android {
             isJniDebuggable = true
             isRenderscriptDebuggable = true
             // Tạo source maps cho debug
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            // applicationIdSuffix = ".debug"
+            // versionNameSuffix = "-debug"
         }
     }
 
