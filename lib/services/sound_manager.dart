@@ -1,4 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:aa_teris/services/share_preference_manager.dart';
+import 'package:flutter/foundation.dart';
 
 class SoundManager {
   static final SoundManager _instance = SoundManager._internal();
@@ -18,6 +20,11 @@ class SoundManager {
 
   SoundManager._internal() {
     reset(); // Khởi tạo ngay khi instance được tạo
+    _loadMuteState(); // Load mute state from SharedPreferences
+  }
+
+  Future<void> _loadMuteState() async {
+    isMuted = await SharedPreferenceManager.getMuted();
   }
 
   void reset() {
@@ -44,8 +51,6 @@ class SoundManager {
 
   Future<void> playSfx(String type) async {
     if (isMuted || isDisposed) {
-      print(
-          '============= LOG check bug isMuted $isMuted | _isDisposed $isDisposed');
       return;
     }
 
@@ -58,7 +63,9 @@ class SoundManager {
 
       await _sfxPlayer.play(AssetSource(filePath));
     } catch (e) {
-      print('============= LOG lỗi playSfx: $e');
+      if (kDebugMode) {
+        print('============= LOG lỗi playSfx: $e');
+      }
     }
   }
 
@@ -83,8 +90,9 @@ class SoundManager {
     }
   }
 
-  void mute(bool mute) {
+  Future<void> mute(bool mute) async {
     isMuted = mute;
+    await SharedPreferenceManager.setMuted(mute);
     if (mute) {
       _bgmPlayer.stop();
       isBgmPlaying = false;

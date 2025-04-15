@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:aa_teris/main.dart';
 import 'package:aa_teris/routes/app_routes.dart';
 import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class StartGame extends StatefulWidget {
@@ -17,16 +14,22 @@ class StartGame extends StatefulWidget {
 class _StartGameState extends State<StartGame>
     with RouteAware, WidgetsBindingObserver {
   late ValueNotifier<int> hightScore;
+  late ValueNotifier<bool> isMuted;
 
   @override
   void initState() {
     super.initState();
     hightScore = ValueNotifier<int>(0);
+    isMuted = ValueNotifier<bool>(false); // Default value
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // _setSystemUIMode();
-      _setHightScore();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _setHightScore();
+      await _loadMuteState();
     });
+  }
+
+  Future<void> _loadMuteState() async {
+    isMuted.value = await SharedPreferenceManager.getMuted();
   }
 
   @override
@@ -49,35 +52,6 @@ class _StartGameState extends State<StartGame>
 
   Future<void> _setHightScore() async {
     hightScore.value = await SharedPreferenceManager.getHighScore();
-  }
-
-  void _setSystemUIMode() {
-    final isIos = Platform.isIOS;
-    if (isIos) {
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.immersiveSticky,
-        overlays: [], // Ẩn bottom navigation bar
-      );
-    } else {
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: [SystemUiOverlay.top], // Ẩn bottom navigation bar
-      );
-    }
-  }
-
-  @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-
-    // Kiểm tra nếu bottom navigation bar vừa hiển thị
-    // final viewInsets = WidgetsBinding.instance.window.viewInsets.bottom;
-    // if (viewInsets > 0) {
-    // Nếu người dùng vuốt lên, hiển thị bottom navigation bar trong 3s
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   _setSystemUIMode();
-    // });
-    // }
   }
 
   @override
@@ -172,7 +146,19 @@ class _StartGameState extends State<StartGame>
       children: [
         Icon(Icons.star_border, color: Colors.amber[100]),
         SizedBox(width: 12),
-        Icon(Icons.volume_up, color: Colors.amber[100]),
+        ValueListenableBuilder(
+          valueListenable: isMuted,
+          builder: (context, value, child) => InkWell(
+            onTap: () async {
+              isMuted.value = !isMuted.value;
+              await soundManager.mute(isMuted.value);
+            },
+            child: Icon(
+              value ? Icons.volume_off : Icons.volume_up,
+              color: Colors.amber[100],
+            ),
+          ),
+        ),
       ],
     );
   }
