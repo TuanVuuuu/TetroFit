@@ -5,11 +5,12 @@ import 'app.dart';
 
 RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-late final SoundManager soundManager;
+// Use the singleton sound manager instance
+final SoundManager soundManager = SoundManager();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  soundManager = SoundManager();
+  // No need to initialize soundManager here as it's a singleton and already initialized above
 
   runApp(const MyApp());
 }

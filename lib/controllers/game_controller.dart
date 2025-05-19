@@ -8,16 +8,16 @@ import 'package:aa_teris/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-int initializeFrameRate = 1000;
-
 class BoardGameController extends GetxController {
   Rx<Timer> countdownTimer = Timer(Duration.zero, () {}).obs;
   Rx<Piece> currentPiece = Piece(type: Tetromino.L).obs;
 
   Rx<int> currentScore = 0.obs;
+  Rx<Difficulty> currentDifficulty = Difficulty.medium.obs;
 
   Rx<Timer> gameTimer = Timer(Duration.zero, () {}).obs;
-  Rx<Duration> frameRate = Duration(milliseconds: initializeFrameRate).obs;
+  Rx<Duration> frameRate =
+      Duration(milliseconds: Difficulty.medium.initialFrameRate).obs;
 
   Rx<int> countdown = 3.obs;
   Rx<bool> isPaused = false.obs;
@@ -28,10 +28,37 @@ class BoardGameController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadDifficulty();
     resetGame();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       startCountdown();
     });
+  }
+
+  Future<void> _loadDifficulty() async {
+    currentDifficulty.value =
+        await SharedPreferenceManager.getCurrentDifficulty();
+    frameRate.value = Duration(
+      milliseconds: currentDifficulty.value.initialFrameRate,
+    );
+
+    initSettingDifficulty();
+  }
+
+  void initSettingDifficulty() {
+    final args = Get.arguments;
+    if (args != null &&
+        args is Map<String, dynamic> &&
+        args.containsKey("difficulty")) {
+      final difficulty = args["difficulty"] as Difficulty;
+      setDifficulty(difficulty);
+    }
+  }
+
+  Future<void> setDifficulty(Difficulty difficulty) async {
+    currentDifficulty.value = difficulty;
+    frameRate.value = Duration(milliseconds: difficulty.initialFrameRate);
+    await SharedPreferenceManager.setCurrentDifficulty(difficulty);
   }
 
   @override
@@ -87,13 +114,16 @@ class BoardGameController extends GetxController {
   }
 
   void setGameOver() {
-    soundManager.playSfx('game_over');
+    soundManager.playSfx(SfxType.gameOver);
     gameOver.value = true;
     setHighScore();
   }
 
   Future<void> setHighScore() async {
-    await SharedPreferenceManager.setHighScore(currentScore.value);
+    await SharedPreferenceManager.setHighScore(
+      currentScore.value,
+      currentDifficulty.value,
+    );
   }
 
   bool isGameOver() {
@@ -138,7 +168,8 @@ class BoardGameController extends GetxController {
 
   void updateFrameRate() {
     const int minFrameRate = 100; // Giới hạn tối thiểu (ms)
-    int initialFrameRate = initializeFrameRate; // Frame rate ban đầu (ms)
+    int initialFrameRate =
+        currentDifficulty.value.initialFrameRate; // Frame rate ban đầu (ms)
     const double k = 0.00005; // Hệ số giảm tốc
 
     int newFrameRate =
@@ -220,7 +251,7 @@ class BoardGameController extends GetxController {
 
         // Cập nhật điểm số
         currentScore.value += 100;
-        soundManager.playSfx('line_clear');
+        soundManager.playSfx(SfxType.lineClear);
       }
     }
   }
@@ -256,7 +287,7 @@ class BoardGameController extends GetxController {
     while (!checkCollision(Direction.down)) {
       movePiece(Direction.down);
     }
-    soundManager.playSfx('block_place');
+    soundManager.playSfx(SfxType.blockPlace);
     checkLanding(); // Khi rơi xong, kiểm tra và cập nhật game board
   }
 

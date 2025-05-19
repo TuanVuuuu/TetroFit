@@ -18,21 +18,26 @@ class GameBoardView extends GetView<BoardGameController> {
       extendBodyBehindAppBar: true,
       appBar: BoardGameHeader(
         title: Obx(
-          () => Text(
-            "Score: ${controller.currentScore.value}",
-            style: BoardGameHeader.dfTitleStyle,
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Score: ${controller.currentScore.value}",
+                style: BoardGameHeader.dfTitleStyle,
+              ),
+              Text(
+                "Difficulty: ${controller.currentDifficulty.value.name.capitalize}",
+                style: TextStyle(color: Colors.amber[100], fontSize: 12),
+              ),
+            ],
           ),
         ),
-        actions: [
-          _buildAction(),
-        ],
+        actions: [_buildAction()],
       ),
       backgroundColor: Colors.black,
-      body: Stack(children: [
-        BackGroundImage(),
-        _buildBody(),
-        _buildOverlayPauseGame(),
-      ]),
+      body: Stack(
+        children: [BackGroundImage(), _buildBody(), _buildOverlayPauseGame()],
+      ),
     );
   }
 
@@ -52,7 +57,7 @@ class GameBoardView extends GetView<BoardGameController> {
                 _buildBoardGame(),
                 Spacer(),
                 _buildControlGame(),
-                Spacer()
+                Spacer(),
               ],
             ),
           ),
@@ -74,7 +79,9 @@ class GameBoardView extends GetView<BoardGameController> {
               icon: Icons.arrow_back_ios_new,
             ),
             _buildButtonControl(
-                onTap: controller.rotatePeice, icon: Icons.rotate_right),
+              onTap: controller.rotatePeice,
+              icon: Icons.rotate_right,
+            ),
             _buildButtonControl(
               onTap: controller.moveRight,
               icon: Icons.arrow_forward_ios,
@@ -92,7 +99,9 @@ class GameBoardView extends GetView<BoardGameController> {
         width: 100,
         height: 100,
         decoration: BoxDecoration(
-            shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.2)),
+          shape: BoxShape.circle,
+          color: Colors.white.withValues(alpha: 0.2),
+        ),
         child: Center(
           child: Icon(icon ?? Icons.arrow_back_ios_new, color: Colors.white),
         ),
@@ -130,10 +139,7 @@ class GameBoardView extends GetView<BoardGameController> {
                   } else if (controller.gameBoard[row][col] != null) {
                     // final Tetromino? tetrominoType = gameBoard[row][col];
 
-                    return Pixel(
-                      color: Colors.amber[100],
-                      child: index,
-                    );
+                    return Pixel(color: Colors.amber[100], child: index);
                   } else {
                     return Pixel(color: Colors.grey.shade900, child: index);
                   }
@@ -156,6 +162,7 @@ class GameBoardView extends GetView<BoardGameController> {
       final isPaused = controller.isPaused.value;
       final gameOver = controller.gameOver.value;
       final currentScore = controller.currentScore.value;
+      final difficulty = controller.currentDifficulty.value;
       if (isPaused || gameOver) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -170,7 +177,8 @@ class GameBoardView extends GetView<BoardGameController> {
                   children: [
                     Spacer(),
                     _buildTextOverlay(
-                        label: gameOver ? "Game Over!" : "Paused!"),
+                      label: gameOver ? "Game Over!" : "Paused!",
+                    ),
                     SizedBox(height: 50),
                     if (isPaused)
                       AAButton(
@@ -178,10 +186,18 @@ class GameBoardView extends GetView<BoardGameController> {
                         ontap: () => controller.resumeGame(),
                       ),
                     if (gameOver) ...[
-                      Text("Score",
-                          style: TextStyle(color: Colors.white, fontSize: 18)),
-                      Text(currentScore.toString(),
-                          style: TextStyle(color: Colors.white, fontSize: 24)),
+                      Text(
+                        "Score",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      Text(
+                        currentScore.toString(),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
+                      ),
+                      Text(
+                        "Difficulty: ${difficulty.name.capitalize}",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ],
                     AAButton(
                       label: "Restart",
@@ -205,13 +221,7 @@ class GameBoardView extends GetView<BoardGameController> {
 
   Center _buildTextOverlay({required String label}) {
     return Center(
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 30,
-          color: Colors.white,
-        ),
-      ),
+      child: Text(label, style: TextStyle(fontSize: 30, color: Colors.white)),
     );
   }
 
@@ -221,19 +231,14 @@ class GameBoardView extends GetView<BoardGameController> {
       final isPaused = controller.isPaused.value;
       return Padding(
         padding: const EdgeInsets.all(10.0),
-        child: (countDown == 0 && !isPaused)
-            ? InkWell(
-                onTap: () => controller.pauseGame(),
-                child: Icon(
-                  Icons.pause,
-                  color: Colors.amber[100],
-                ),
-              )
-            : !isPaused
-                ? Text(
-                    "$countDown",
-                    style: BoardGameHeader.dfActionTextStyle,
-                  )
+        child:
+            (countDown == 0 && !isPaused)
+                ? InkWell(
+                  onTap: () => controller.pauseGame(),
+                  child: Icon(Icons.pause, color: Colors.amber[100]),
+                )
+                : !isPaused
+                ? Text("$countDown", style: BoardGameHeader.dfActionTextStyle)
                 : SizedBox.shrink(),
       );
     });

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:aa_teris/values/values.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +15,20 @@ class SoundManager {
   }
 
   late AudioPlayer _bgmPlayer;
-  late AudioPlayer _sfxPlayer;
+  final Map<SfxType, AudioPlayer> _sfxPlayers = {};
+  final Map<SfxType, bool> _isPlaying = {};
+  final Map<SfxType, Timer?> _soundTimers = {};
+
+  // Duration in milliseconds for each sound effect
+  final Map<SfxType, int> _soundDurations = {
+    SfxType.blockPlace: 300,
+    SfxType.lineClear: 500,
+    SfxType.gameOver: 1000,
+    SfxType.combo: 700,
+    SfxType.buttonClick: 200,
+    SfxType.invalidMove: 300,
+    SfxType.highScore: 800,
+  };
 
   bool isBgmPlaying = false;
   bool isMuted = false;
@@ -32,14 +48,35 @@ class SoundManager {
     isMuted = false;
     isDisposed = false;
 
-    _bgmPlayer = AudioPlayer(); // Khởi tạo lại
-    _sfxPlayer = AudioPlayer(); // Khởi tạo lại
+    // Initialize or reset audio players
+    _bgmPlayer = AudioPlayer();
+
+    // Cancel all timers
+    _cancelAllTimers();
+
+    // Reset players and state for each sound type
+    for (var type in SfxType.values) {
+      // Dispose existing player if any
+      _sfxPlayers[type]?.dispose();
+      // Create new player
+      _sfxPlayers[type] = AudioPlayer();
+      // Reset state
+      _isPlaying[type] = false;
+      _soundTimers[type] = null;
+    }
+  }
+
+  void _cancelAllTimers() {
+    for (var timer in _soundTimers.values) {
+      timer?.cancel();
+    }
   }
 
   Future<void> playBgm(String filePath, {bool loop = true}) async {
     if (isMuted || isBgmPlaying) return;
-    await _bgmPlayer
-        .setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.release);
+    await _bgmPlayer.setReleaseMode(
+      loop ? ReleaseMode.loop : ReleaseMode.release,
+    );
     await _bgmPlayer.play(AssetSource(filePath));
     isBgmPlaying = true;
   }
@@ -49,8 +86,9 @@ class SoundManager {
     isBgmPlaying = false;
   }
 
-  Future<void> playSfx(String type) async {
-    if (isMuted || isDisposed) {
+  Future<void> playSfx(SfxType type) async {
+    // Don't play if muted, disposed or already playing this sound
+    if (isMuted || isDisposed || _isPlaying[type] == true) {
       return;
     }
 
@@ -61,40 +99,49 @@ class SoundManager {
         return;
       }
 
-      await _sfxPlayer.play(AssetSource(filePath));
+      // Mark this sound type as currently playing
+      _isPlaying[type] = true;
+
+      // Set a timer to mark when this sound is done playing
+      _soundTimers[type]?.cancel();
+      _soundTimers[type] = Timer(
+        Duration(milliseconds: _soundDurations[type] ?? 500),
+        () {
+          _isPlaying[type] = false;
+          _soundTimers[type] = null;
+        },
+      );
+
+      // Use the dedicated player for this sound type
+      final player = _sfxPlayers[type];
+      if (player != null) {
+        await player.play(AssetSource(filePath));
+      }
     } catch (e) {
+      // Reset the playing status if there was an error
+      _isPlaying[type] = false;
+      _soundTimers[type]?.cancel();
+      _soundTimers[type] = null;
+
       if (kDebugMode) {
         print('============= LOG lỗi playSfx: $e');
       }
     }
   }
 
-  String _getSfxFilePath(String type) {
-    switch (type) {
-      case 'block_place':
-        return 'audio/block_place.wav';
-      case 'line_clear':
-        return 'audio/line_clear.wav';
-      case 'game_over':
-        return 'audio/game_over.wav';
-      case 'combo':
-        return 'audio/combo.wav';
-      case 'button_click':
-        return 'audio/button_click.wav';
-      case 'invalid_move':
-        return 'audio/invalid_move.wav';
-      case 'high_score':
-        return 'audio/high_score.wav';
-      default:
-        return 'audio/block_place.wav';
-    }
+  String _getSfxFilePath(SfxType type) {
+    return 'audio/${type.value}.wav';
   }
 
   Future<void> mute(bool mute) async {
     isMuted = mute;
     await SharedPreferenceManager.setMuted(mute);
     if (mute) {
+      // Stop all audio
       _bgmPlayer.stop();
+      for (var player in _sfxPlayers.values) {
+        player.stop();
+      }
       isBgmPlaying = false;
     }
   }
@@ -103,7 +150,10 @@ class SoundManager {
     if (isDisposed) return;
     isDisposed = true;
 
+    _cancelAllTimers();
     _bgmPlayer.dispose();
-    _sfxPlayer.dispose();
+    for (var player in _sfxPlayers.values) {
+      player.dispose();
+    }
   }
 }

@@ -1,11 +1,29 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 final rowLength = 10;
 final colLength = 15;
 
 enum Direction { left, right, down }
+
+enum Difficulty {
+  easy(1000),
+  medium(700),
+  hard(400);
+
+  const Difficulty(this.initialFrameRate);
+  final int initialFrameRate;
+
+  Color getColor() {
+    switch (this) {
+      case Difficulty.easy:
+        return Colors.green;
+      case Difficulty.medium:
+        return Colors.amber;
+      case Difficulty.hard:
+        return Colors.red;
+    }
+  }
+}
 
 enum Tetromino {
   L(Color(0xFFFFA500)),
@@ -18,4 +36,17 @@ enum Tetromino {
 
   const Tetromino(this.color);
   final Color color;
+}
+
+enum SfxType {
+  blockPlace("block_place"),
+  lineClear("line_clear"),
+  gameOver("game_over"),
+  combo("combo"),
+  buttonClick("button_click"),
+  invalidMove("invalid_move"),
+  highScore("high_score");
+
+  const SfxType(this.value);
+  final String value;
 }
