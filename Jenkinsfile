@@ -48,26 +48,27 @@ pipeline {
             }
         }
         
-        stage('Configure Gradle') {
+        stage('Setup Gradle') {
             steps {
                 sh '''
-                    # Check current permissions
-                    ls -l android/gradlew
+                    # Check if Gradle is installed
+                    if ! command -v gradle &> /dev/null; then
+                        echo "Gradle is not installed. Installing Gradle..."
+                        sudo apt-get update
+                        sudo apt-get install -y gradle
+                    fi
+                    
+                    # Check if gradlew exists, if not generate it
+                    cd android
+                    if [ ! -f gradlew ]; then
+                        echo "Gradle wrapper not found. Generating..."
+                        gradle wrapper
+                    fi
                     
                     # Set execute permissions
-                    chmod +x android/gradlew
+                    chmod +x gradlew
                     
-                    # Verify permissions
-                    ls -l android/gradlew
-                    
-                    # Configure Gradle
-                    echo "org.gradle.daemon=false" >> android/gradle.properties
-                    echo "org.gradle.parallel=true" >> android/gradle.properties
-                    echo "org.gradle.configureondemand=true" >> android/gradle.properties
-                    echo "org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" >> android/gradle.properties
-                    
-                    # Test Gradle wrapper
-                    cd android
+                    # Verify Gradle wrapper
                     ./gradlew --version
                     cd ..
                 '''
