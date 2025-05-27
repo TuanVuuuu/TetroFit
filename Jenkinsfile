@@ -5,7 +5,6 @@ pipeline {
         FLUTTER_HOME = '/opt/flutter'
         ANDROID_HOME = '/opt/android-sdk'
         PATH = "${env.PATH}:${env.FLUTTER_HOME}/bin:${env.ANDROID_HOME}/tools:${env.ANDROID_HOME}/platform-tools"
-        PATH+EXTRA = "${env.FLUTTER_HOME}/bin:${env.ANDROID_HOME}/tools:${env.ANDROID_HOME}/platform-tools"
     }
     
     stages {
@@ -15,33 +14,43 @@ pipeline {
             }
         }
         
-        stage('Setup') {
+        stage('Setup Environment') {
             steps {
-                sh 'flutter pub get'
+                sh '''
+                    export PATH="${env.PATH}"
+                    flutter --version
+                    flutter pub get
+                '''
             }
         }
         
         stage('Build Dev') {
             steps {
-                sh 'flutter build apk --flavor dev -t lib/main_dev.dart'
+                sh '''
+                    export PATH="${env.PATH}"
+                    flutter build apk --flavor dev -t lib/main_dev.dart
+                '''
+                archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/app-dev.apk', fingerprint: true
             }
         }
         
         stage('Build Stag') {
             steps {
-                sh 'flutter build apk --flavor stag -t lib/main_stag.dart'
+                sh '''
+                    export PATH="${env.PATH}"
+                    flutter build apk --flavor stag -t lib/main_stag.dart
+                '''
+                archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/app-stag.apk', fingerprint: true
             }
         }
         
         stage('Build Prod') {
             steps {
-                sh 'flutter build apk --flavor prod -t lib/main_prod.dart'
-            }
-        }
-        
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/*.apk', fingerprint: true
+                sh '''
+                    export PATH="${env.PATH}"
+                    flutter build apk --flavor prod -t lib/main_prod.dart
+                '''
+                archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/app-prod.apk', fingerprint: true
             }
         }
     }
