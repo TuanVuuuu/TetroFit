@@ -150,10 +150,28 @@ class SoundManager {
     if (isDisposed) return;
     isDisposed = true;
 
+    // Reset playing state
+    for (var type in SfxType.values) {
+      _isPlaying[type] = false;
+    }
+
     _cancelAllTimers();
+
+    // Make sure to cancel and dispose all audio players
+    _bgmPlayer.stop();
     _bgmPlayer.dispose();
+
     for (var player in _sfxPlayers.values) {
+      player.stop();
       player.dispose();
     }
+    _sfxPlayers.clear();
+
+    isBgmPlaying = false;
+  }
+
+  // Add a static method to access from anywhere
+  static void disposeAll() {
+    _instance.dispose();
   }
 }

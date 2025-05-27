@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:aa_teris/main.dart';
 import 'package:aa_teris/services/share_preference_manager.dart';
 import 'package:aa_teris/models/piece.dart';
+import 'package:aa_teris/services/sound_manager.dart';
 import 'package:aa_teris/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'package:get/get.dart';
 class BoardGameController extends GetxController {
   Rx<Timer> countdownTimer = Timer(Duration.zero, () {}).obs;
   Rx<Piece> currentPiece = Piece(type: Tetromino.L).obs;
+  Rx<Piece> nextPiece = Piece(type: Tetromino.J).obs;
 
   Rx<int> currentScore = 0.obs;
   Rx<Difficulty> currentDifficulty = Difficulty.medium.obs;
@@ -63,10 +65,29 @@ class BoardGameController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
+    // Cancel all timers
+    if (countdownTimer.value.isActive) {
+      countdownTimer.value.cancel();
+    }
+    if (gameTimer.value.isActive) {
+      gameTimer.value.cancel();
+    }
+
+    // Reset game state
     resetGame();
-    countdownTimer.value.cancel();
-    super.dispose();
+
+    // Release game resources
+    currentPiece.value = Piece(type: Tetromino.L);
+    nextPiece.value = Piece(type: Tetromino.L);
+    currentScore.value = 0;
+    countdown.value = 3;
+    isPaused.value = false;
+    gameOver.value = false;
+
+    // Clean up sound resources
+    soundManager.reset();
+
+    super.onClose();
   }
 
   void startCountdown() {
@@ -95,18 +116,30 @@ class BoardGameController extends GetxController {
     gameOver.value = false;
     isPaused.value = false;
     currentScore.value = 0;
+
+    // Tạo khối tiếp theo trước
+    generateNextPiece();
+
+    // Tạo khối hiện tại
     createNewPiece();
   }
 
-  void createNewPiece() {
+  void generateNextPiece() {
     Random random = Random();
-
     Tetromino randomType =
         Tetromino.values[random.nextInt(Tetromino.values.length)];
+    nextPiece.value = Piece(type: randomType);
+    nextPiece.refresh();
+  }
 
-    currentPiece.value = Piece(type: randomType);
+  void createNewPiece() {
+    // Dùng next piece làm current piece
+    currentPiece.value = Piece(type: nextPiece.value.type);
     currentPiece.value.position = currentPiece.value.initializePiece();
     currentPiece.refresh();
+
+    // Tạo khối mới cho next piece
+    generateNextPiece();
 
     if (isGameOver()) {
       setGameOver();
@@ -278,8 +311,28 @@ class BoardGameController extends GetxController {
   }
 
   void backToHome() {
-    resetGame();
-    Get.back();
+    // Cờ hiệu báo đang thoát để tránh các chức năng khác được gọi
+    isPaused.value = true;
+    gameOver.value = true;
+
+    // Hủy tất cả timers trước khi điều hướng
+    if (countdownTimer.value.isActive) {
+      countdownTimer.value.cancel();
+    }
+    if (gameTimer.value.isActive) {
+      gameTimer.value.cancel();
+    }
+
+    // Clean up các tài nguyên trước khi back
+    soundManager.reset();
+
+    // Chuyển trang, trì hoãn một chút để đảm bảo UI cập nhật đúng cách
+    Future.delayed(Duration(milliseconds: 50), () {
+      // Đảm bảo context vẫn hợp lệ trước khi điều hướng
+      if (Get.isRegistered<BoardGameController>()) {
+        Get.back();
+      }
+    });
   }
 
   void downSpeed() {

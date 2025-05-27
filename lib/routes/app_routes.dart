@@ -6,10 +6,7 @@ import 'package:aa_teris/views/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-enum AppRoute {
-  HOME,
-  GAME,
-}
+enum AppRoute { HOME, GAME }
 
 extension AppRouteExt on AppRoute {
   String get name {
@@ -33,10 +30,20 @@ extension AppRouteExt on AppRoute {
   Bindings get binding {
     switch (this) {
       case AppRoute.HOME:
-        return BindingsBuilder(() {});
+        return BindingsBuilder(() {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (Get.isRegistered<BoardGameController>()) {
+              Get.delete<BoardGameController>(force: true);
+            }
+          });
+        });
       case AppRoute.GAME:
         return BindingsBuilder(() {
-          Get.put(BoardGameController());
+          if (Get.isRegistered<BoardGameController>()) {
+            Get.delete<BoardGameController>(force: true);
+          }
+
+          Get.put(BoardGameController(), permanent: false);
         });
     }
   }
